@@ -1,4 +1,3 @@
-
 El cambio climático ya es un riesgo para la salud en España por las temperaturas extremas y el contagio de enfermedades
 
     Las olas de calor y frío aumentan las muertes a partir de cierto umbral: las altas temperaturas de forma más inmediata, las bajas con una acción más diferida
@@ -31,7 +30,3 @@ Precisamente este miércoles, se confirmó la presencia en España de una de la 
 El agente que sí se ha establecido ya en la península ibérica es el mosquito tigre (Aedes albopictus), este sí directamente asociado a la propagación del chinkungunya, el dengue o el zika. Basta con observar el ritmo de colonización : los mapas de seguimiento del ECDC muestran que este insecto estaba establecido en solo dos provincias (Barcelona y Tarragona) en 2008 –y con alta probabilidad en Alicante–. Y, en junio de 2018, se ha extendido por el litoral mediterráneo y establecido colonias en toda Catalunya menos Lleida, toda la Comunitat Valenciana, Región de Murcia, Baleares, Almería, Granada, Málaga y Guipúzcoa. 
 
 Los estudios vinculan claramente el cambio climático con la expansión del mosquito tigre. Aunque llegado a España por el transporte de mercancías (se atribuye su entrada a unos neumáticos con agua), las nuevas condiciones ambientales han favorecido su colonización: la alteración climática ha hecho que las condiciones térmicas adecuadas para la actividad del insecto duren más durante el año y la mayor temperatura acelera su ciclo vital (más generaciones de mosquitos en el mismo tiempo) lo que redunda en un "riesgo evidente a nivel de transmisión de enfermedades", sentencias los investigadores. 
-
-
-
-
