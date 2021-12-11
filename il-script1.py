@@ -11,6 +11,7 @@ from nltk.tokenize import word_tokenize
 from nltk.tokenize import RegexpTokenizer
 
 
+
 ###############################################################################
 ################### PRE PROCESSING ############################################
 ###############################################################################
@@ -202,7 +203,7 @@ def tf_idf(doc, idf):
 #Compute tf-idf for test set
 correct = 0
 total = 0
-for doc in test:
+for doc in test: # clasificador
     gl_tuple = tf_idf(doc, IDF)
     gl = gl_tuple[0]
     dist = [0] * len(categories)
