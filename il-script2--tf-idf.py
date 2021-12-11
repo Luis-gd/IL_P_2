@@ -9,8 +9,12 @@ from scipy.spatial import distance
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.tokenize import RegexpTokenizer
+from operator import itemgetter
 
-
+#Parameter to dectivate or activate prints
+verbose = True
+#Global Parameter: size of Glosary
+top_k = 60
 ###############################################################################
 ################### PRE PROCESSING ############################################
 ###############################################################################
@@ -22,9 +26,7 @@ stop_words = set(stopwords.words('spanish'))
 #print(stopwords.words())
 
 #Tokenizer
-#tokenizer = RegexpTokenizer(r'\w+')
-#tokenizer = RegexpTokenizer(r'[a-zA-Z]{3,}')
-tokenizer = RegexpTokenizer(r'[A-Za-z_À-ÿ]+')
+tokenizer = RegexpTokenizer(r'[A-Za-z_À-ÿ]{3,}')
 #Read files, tokenize and remove stopwords
 train = []
 test = []
@@ -39,7 +41,7 @@ for i in range(30):
         path = os.path.dirname(__file__)+"/dataset/"+cat+"/"+cat+str(2*i+1)+".txt"
         with open(path) as f:
             text = f.read()
-            if len(text) < 35:
+            if len(text) < top_k:
                 print("# WARNING: text "+categories[j]+str(2*i+1)+".txt, might be empty ")
                 print("text:\n"+text)
             #text = text.replace('\n', ' ')
@@ -51,7 +53,7 @@ for i in range(30):
         path = os.path.dirname(__file__)+"/dataset/"+cat+"/"+cat+str(2*i+2)+".txt"
         with open(path) as f:
              text = f.read()
-             if len(text) < 35:
+             if len(text) < top_k:
                  print("# WARNING: text "+categories[j]+str(2*i+1)+".txt, might be empty ")
                  print("text:\n"+text)
              #text = text.replace('\n', ' ')
@@ -80,81 +82,28 @@ for doc in train:
 for doc in test:
     union = set(union).union(set(doc[0]))
 
-#Total document frec:
-frecTotal = dict.fromkeys(union,0)
+#IDF  initialization
 
-#Frecuency by label, TF, IDF and TF-IDF initialization
-category_union = []
-TF = []
 IDF = dict.fromkeys(union,0)
-TF_IDF = []
-for cat in categories:
-    category_union.append(dict.fromkeys(union,0))
-    TF.append(dict.fromkeys(union,0))
-    #IDF.append(dict.fromkeys(union,0))
-    TF_IDF.append(dict.fromkeys(union,0))
-
-#Frecuency of cateogries and total Frecuency
-for doc in train:
-    for token in doc[0]:
-        category_union[doc[1]][token] += 1
-        frecTotal[token] += 1
-
-#Compute TF values for entire document
-for token in union:
-    for j in range((len(TF))):
-        TF[j][token] = category_union[j][token]#/frecTotal[token]
 
 #Compute IDF values
 for token in union:
+    #Train docs
     for doc in train:
         if token in doc[0]:
             IDF[token] += 1
-
+    #Test document
     for doc in test:
         if token in doc[0]:
             IDF[token] += 1
 
-#IDF Values and TF-IDF
+#IDF Values
 for token in union:
     IDF[token] = math.log10((N/(1+IDF[token])))
-    for j in range((len(TF))):
-        TF_IDF[j][token] = (TF[j][token]) * (IDF[token])
-
-## Get 35 Top elements as a glossary, Print
-glossary = [[]] * len(categories)
-glossary_arr = [0] * len(categories)
-for j in range(len(categories)):
-    glossary[j] = []
-    glossary_arr[j] = []
-    print("------------------------------------------------------")
-    print("---------"+categories[j]+"--------------------------------")
-    print("------------------------------------------------------")
-    l = sorted(TF_IDF[j].items(), key=itemgetter(1), reverse=True)
-    glossary[j] = l[:35]
-    k=0
-    for token in union:
-        match = False
-        for tuple in glossary[j]:
-            if token == tuple[0]:
-                match = True
-                break
-        if match:
-            glossary_arr[j].append(1)
-            k += 1
-        else:
-            glossary_arr[j].append(0)
-
-    if k < 35:
-        print("WARNING: j = "+str(k))
-
-    #print(glossary_arr[j])
-    str_print = str(glossary[j]).strip('[]')
-    #print("Size: "+str(len(glossary[j])))
-    #print("Glosary ("+str(j+1)+"):\n"+str_print.replace('),',')\n'))
 
 #Compute tf-idf glossary of a single document with label [tokenized_text, label]
-def tf_idf(doc, idf):
+#Computes array and glossary with top_k terms
+def tf_idf(doc, idf, top_k):
     dic_doc_tf = dict.fromkeys(union,0)
     dic_doc_tf_idf = dict.fromkeys(union,0)
     #TF
@@ -168,18 +117,11 @@ def tf_idf(doc, idf):
         print("# WARNING: All zero tf")
         print("Category "+categories[doc[1]]+" Doc:\n"+str(doc[0]))
 
-    all_zero_idf = True
-
     for token in doc[0]:
         dic_doc_tf_idf[token] = (idf[token]) * (dic_doc_tf[token])
-        if idf[token] > 0:
-            all_zero_idf = False
-
-    if(all_zero_idf):
-        print("# WARNING: All zero idf")
 
     l = sorted(dic_doc_tf_idf.items(), key=itemgetter(1), reverse=True)
-    l = l[:35]
+    l = l[:top_k]
     #Compute array
     arr = []
     k=0
@@ -195,42 +137,52 @@ def tf_idf(doc, idf):
         else:
             arr.append(0)
 
-    if k < 35:
+    if k < top_k:
         print("WARNING: j = "+str(j))
     return [arr, l]
+
+#Takes pair_train_set_vectors: a pair of a vector embeding a the train set documents and it's category [vec: array, cat: int]
+#and a document ([doc: str,category: int]) returns a category and vector with distance to each category
+#It computes using distance "dist":
+#   dist = cosine, dist = hamming, dist = q->q-norm
+def categorize(pair_train_set_vectors, arr, dist):
+    cat = [0]*len(categories)
+    for v in pair_train_set_vectors:
+        if dist == 'cosine':
+            cat[v[1]] += distance.cosine(v[0],arr)
+        elif dist == 'euclidean':
+            cat[v[1]] += distance.euclidean(v[0],arr)
+        elif dist == 'hamming':
+            cat[v[1]] += distance.hamming(v[0],arr)
+        elif dist == 'cityblock':
+            cat[v[1]] += distance.cityblock(v[0],arr)
+        elif dist == 'chebyshev':
+            cat[v[1]] += distance.chebyshev(v[0],arr)
+
+    return [np.argmin(cat), cat]
+
+# Compute tf-idf Glosary for elements of train:
+train_set_vectors_tuples = []
+for doc in train:
+    tuple = []
+    l = tf_idf(doc,IDF,top_k)
+    tuple.append(l[0])
+    tuple.append(doc[1])
+    train_set_vectors_tuples.append(tuple)
 
 #Compute tf-idf for test set
 correct = 0
 total = 0
 for doc in test:
-    gl_tuple = tf_idf(doc, IDF)
+    gl_tuple = tf_idf(doc, IDF, top_k)
     gl = gl_tuple[0]
     dist = [0] * len(categories)
-    for j in range(len(categories)):
-        if(len(gl) == len(glossary_arr[j])):
-            #Cosine distance
-            #dist[j] = 1-distance.cosine(gl,glossary_arr[j])
-            #Hamming distance
-            dist[j] = distance.cosine(gl,glossary_arr[j])
-            if math.isnan(dist[j]):
-                print("NaN Error ("+str(j)+").")
-                print("gl: "+str(gl))
-                print("glossary_arr[j]: "+str(glossary_arr[j]))
-        else:
-            print("Error, size of gl = "+str(len(gl))+", and size of glossary_arr = "+str(len(glossary_arr[j])))
-        #print(str(gl)+' * '+ str(glossary_arr[j]) + " = " + str(dist[j]))
-    #if max(dist) < 0.00000001:
-    #    print("WARNING: Zero distance vector cause by this glossary:")
-        #for tuple in gl_tuple[1]:
-        #    print(tuple)
-    #cat = np.argmax(dist)
-    cat = np.argmin(dist)
-    #print(str(dist)+" Clasified as: "+categories[cat]+", correct categorie is: "+categories[doc[1]])
+    cat = categorize(train_set_vectors_tuples, gl, 'cosine')
     total += 1
-    if cat == doc[1]:
+    if cat[0] == doc[1]:
         correct += 1
-    else:
-        print(str(dist)+" Clasified as: "+categories[cat]+", correct category is: "+categories[doc[1]])
+    elif verbose:
+        print(str(cat[1])+" Clasified as: "+categories[cat[0]]+", correct category is: "+categories[doc[1]])
         for tuple in gl_tuple[1]:
             print(tuple)
 
