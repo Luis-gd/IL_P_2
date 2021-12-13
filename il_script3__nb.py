@@ -3,6 +3,7 @@ import os
 import nltk
 import math
 import numpy as np
+import sklearn
 
 from scipy.special import logsumexp
 from scipy.spatial import distance
@@ -10,11 +11,13 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.tokenize import RegexpTokenizer
 from operator import itemgetter
+from sklearn.naive_bayes import GaussianNB
 
 ###############################################################################
 ################### PRE PROCESSING ############################################
 ###############################################################################
-def read(categories, top_k):
+#return [train, test]
+def read(categories):
     #Import stop words:
     #nltk.download('stopwords')
     #nltk.download('punkt')
@@ -37,11 +40,6 @@ def read(categories, top_k):
             path = os.path.dirname(__file__)+"/dataset/"+cat+"/"+cat+str(2*i+1)+".txt"
             with open(path) as f:
                 text = f.read()
-                if len(text) < top_k:
-                    print("# WARNING: text "+categories[j]+str(2*i+1)+".txt, might be empty ")
-                    print("text:\n"+text)
-                #text = text.replace('\n', ' ')
-                #text_tokens = text.split(' ')
                 text_tokens = tokenizer.tokenize(text)
                 filtered_text = [w for w in text_tokens if not w.lower() in stop_words]
                 train.append([filtered_text,j])
@@ -49,11 +47,6 @@ def read(categories, top_k):
             path = os.path.dirname(__file__)+"/dataset/"+cat+"/"+cat+str(2*i+2)+".txt"
             with open(path) as f:
                  text = f.read()
-                 if len(text) < top_k:
-                     print("# WARNING: text "+categories[j]+str(2*i+2)+".txt, might be empty ")
-                     print("text:\n"+text)
-                 #text = text.replace('\n', ' ')
-                 #text_tokens = text.split(' ')
                  text_tokens = tokenizer.tokenize(text)
                  filtered_text = [w for w in text_tokens if not w.lower() in stop_words]
                  test.append([filtered_text,j])
@@ -68,7 +61,7 @@ def read(categories, top_k):
 ###############################################################################
 
 #Compute IDF glossary of the entire training set
-#print(train[0][0])
+#return [IDF, union]
 def idf(train, test):
     union = []
     N = len(train)+len(test)
@@ -105,6 +98,7 @@ def idf(train, test):
 
 #Compute tf-idf glossary of a single document with label [tokenized_text, label]
 #Computes array and glossary with top_k terms
+# return [arr, l]
 def tf_idf(doc, idf, top_k, categories, union):
     dic_doc_tf = dict.fromkeys(union,0)
     dic_doc_tf_idf = dict.fromkeys(union,0)
@@ -143,70 +137,38 @@ def tf_idf(doc, idf, top_k, categories, union):
         print("WARNING: j = "+str(j))
     return [arr, l]
 
-#Takes pair_train_set_vectors: a pair of a vector embeding a the train set documents and it's category [vec: array, cat: int]
-#and a document ([doc: str,category: int]) returns a category and vector with distance to each category
-#It computes using distance "dist":
-#   dist = cosine, dist = hamming, dist = q->q-norm
-def categorize(pair_train_set_vectors, arr, dist, categories):
-    cat = [0]*len(categories)
-    for v in pair_train_set_vectors:
-        if dist == 'cosine':
-            cat[v[1]] += distance.cosine(v[0],arr)
-        elif dist == 'euclidean':
-            cat[v[1]] += distance.euclidean(v[0],arr)
-        elif dist == 'hamming':
-            cat[v[1]] += distance.hamming(v[0],arr)
-        elif dist == 'cityblock':
-            cat[v[1]] += distance.cityblock(v[0],arr)
-        elif dist == 'chebyshev':
-            cat[v[1]] += distance.chebyshev(v[0],arr)
-
-    return [np.argmin(cat), cat]
-
-# Compute tf-idf Glosary for elements of train:
-def glossary_train(train,IDF,top_k,categories,union):
-    train_set_vectors_tuples = []
+# Compute tf-idf Glosary for elements of train or test:
+#return X, y
+def glossary_create(train, IDF, top_k, categories,union):
+    X = []
+    Y = []
     for doc in train:
         tuple = []
         l = tf_idf(doc,IDF,top_k,categories,union)
-        tuple.append(l[0])
-        tuple.append(doc[1])
-        train_set_vectors_tuples.append(tuple)
+        X.append(l[0])
+        Y.append(doc[1])
 
-    return train_set_vectors_tuples;
+    return [X, Y];
 
-#Compute tf-idf for test set
-def clasiffy(test, IDF, union, train_set_vectors_tuples, top_k, distance, categories, verbose, verbose2):
+########################## NAÏVE BAYES ########################################
 
-    correct = 0
-    total = 0
-    for doc in test:
-        gl_tuple = tf_idf(doc, IDF, top_k, categories, union)
-        gl = gl_tuple[0]
-        dist = [0] * len(categories)
-        cat = categorize(train_set_vectors_tuples, gl, distance, categories)
-        total += 1
-        if cat[0] == doc[1]:
-            correct += 1
-            if verbose2:
-                print(str(cat[1])+" Clasified as: "+categories[cat[0]]+", correct category is: "+categories[doc[1]])
-                for tuple in gl_tuple[1]:
-                    print(tuple)
-        elif verbose:
-            print(str(cat[1])+" Clasified as: "+categories[cat[0]]+", correct category is: "+categories[doc[1]])
-            for tuple in gl_tuple[1]:
-                print(tuple)
+def train_naive_bayes(X, Y, XTest, YTest, verbose):
+    #TRAIN
+    clf = GaussianNB()
+    clf.fit(X, Y)
+    if verbose:
+        print("NAÏVE BAYES Parameters:"+str(clf.get_params()))
 
-    return (correct/total)
+    #TEST
+    return clf.score(XTest,YTest)
 
-#Parameter to dectivate or activate prints: verbose
-#Global Parameter: size of Glosary top_k
 
-def run_tf_idf(top_k, distance, verbose, verbose2):
+def run_nb(top_k, verbose, verbose2):
 
     categories = ["deportes", "salud", "politica"]
-    data = read(categories,top_k);
+    data = read(categories);
     idf_union = idf(data[0],data[1])
-    train_set_vectors_tuples = glossary_train(data[0], idf_union[0],top_k,categories, idf_union[1])
-    acc = clasiffy(data[1], idf_union[0], idf_union[1], train_set_vectors_tuples, top_k, distance, categories, verbose, verbose2)
+    train_set_vectors_tuples = glossary_create(data[0], idf_union[0],top_k, categories, idf_union[1])
+    test_set_vectors_tuples = glossary_create(data[1], idf_union[0],top_k, categories, idf_union[1])
+    acc = train_naive_bayes(train_set_vectors_tuples[0], train_set_vectors_tuples[1], test_set_vectors_tuples[0], test_set_vectors_tuples[1], verbose)
     print("Accuracy: "+str(acc))
