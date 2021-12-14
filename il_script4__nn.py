@@ -3,8 +3,10 @@ import os
 import nltk
 import math
 import numpy as np
-import sklearn
 import time
+import pandas as pd
+import tensorflow as tf
+
 
 from scipy.special import logsumexp
 from scipy.spatial import distance
@@ -12,7 +14,7 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.tokenize import RegexpTokenizer
 from operator import itemgetter
-from sklearn.naive_bayes import BernoulliNB
+from tensorflow import keras
 
 ###############################################################################
 ################### PRE PROCESSING ############################################
@@ -144,34 +146,56 @@ def glossary_create(train, IDF, top_k, categories,union):
     X = []
     Y = []
     for doc in train:
-        tuple = []
+        tuple = [0]*len(categories)
         l = tf_idf(doc,IDF,top_k,categories,union)
         X.append(l[0])
-        Y.append(doc[1])
+        tuple[doc[1]]=1
+        Y.append(tuple)
 
     return [X, Y];
 
 ########################## NAÏVE BAYES ########################################
 
-def train_naive_bayes(X, Y, XTest, YTest, verbose):
-    #TRAIN
-    clf = BernoulliNB()
-    clf.fit(X, Y)
-    if verbose:
-        print("NAÏVE BAYES Parameters:"+str(clf.get_params()))
+def train_nn(X, Y, XTest, YTest, verb):
+    #hyperparameters
+    n_epochs = 1000
+    learning_rate = 0.1
+    n_neurons_per_hlayer = [100]
+    dropout_rate = 0.01
+    l2reg = 0.01
+    batch_size=len(X)
+    layer_activation = "elu"
+    INPUTS = len(X[0])
+    OUTPUTS = len(Y[0])
+    model = keras.Sequential(name="DeepFeedforward")
+    model.add(keras.layers.InputLayer(input_shape=(INPUTS,), batch_size=None))
+    my_initializer = keras.initializers.he_uniform(seed=None)
+    my_regularizer = keras.regularizers.l2(l2reg);
+    for neurons in n_neurons_per_hlayer:
+      model.add(keras.layers.Dense(neurons, activation=layer_activation, kernel_initializer = my_initializer,kernel_regularizer=my_regularizer))
+      model.add(keras.layers.BatchNormalization())
+      model.add(keras.layers.Dropout(rate=dropout_rate))
 
-    #TEST
-    return clf.score(XTest,YTest)
+    model.add(keras.layers.Dense(OUTPUTS, activation="softmax"))
 
+    model.compile(loss=tf.keras.losses.categorical_crossentropy,
+              optimizer=tf.keras.optimizers.SGD(learning_rate=learning_rate),
+              metrics=["categorical_accuracy"])
 
-def run_nb(top_k, verbose, verbose2):
+    history = model.fit(X, Y, batch_size=batch_size, epochs=n_epochs, verbose=0, validation_data=(XTest, YTest))
+    results=pd.DataFrame(history.history)
+    if verb:
+        print(results[-1:])
+    return results.val_categorical_accuracy.values[-1:][0]
+
+def run_nn(top_k, verbose, verbose2):
     t0 = time.time()
     categories = ["deportes", "salud", "politica"]
     data = read(categories);
     idf_union = idf(data[0],data[1])
     train_set_vectors_tuples = glossary_create(data[0], idf_union[0],top_k, categories, idf_union[1])
     test_set_vectors_tuples = glossary_create(data[1], idf_union[0],top_k, categories, idf_union[1])
-    acc = train_naive_bayes(train_set_vectors_tuples[0], train_set_vectors_tuples[1], test_set_vectors_tuples[0], test_set_vectors_tuples[1], verbose)
+    acc = train_nn(train_set_vectors_tuples[0], train_set_vectors_tuples[1], test_set_vectors_tuples[0], test_set_vectors_tuples[1], verbose)
     t1 = time.time()
     print("Accuracy: "+str(acc))
     return [acc, (t1-t0)]
