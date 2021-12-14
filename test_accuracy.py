@@ -12,8 +12,8 @@ from nltk.tokenize import word_tokenize
 from nltk.tokenize import RegexpTokenizer
 from operator import itemgetter
 from sklearn.naive_bayes import GaussianNB
-import il_script1__vs as z
-import il_script2__tf_idf as y
+import il_script1__vs_2 as z
+import il_script2__vs as y
 import il_script3__nb as x
 import il_script4__nn as w
 import matplotlib.pyplot as plt
@@ -43,8 +43,14 @@ def plot_test(interval, model, max):
             xx = w.run_nn(top_k, False, False)
             ex_t.append(xx[1])
             acc.append(xx[0])
-
+            
+    #Accuracy  plot
     plt.plot(x_axis,acc,'b')
+    plt.xlabel ("Tamaño de glosario")
+    plt.ylabel ("Precisión")
+    #Computational time
     plt.show()
     plt.plot(x_axis, ex_t,'r')
+    plt.xlabel ("Tamaño de glosario")
+    plt.ylabel ("Tiempo de computación")
     plt.show()
