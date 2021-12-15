@@ -149,7 +149,7 @@ def category_glossary(top_k, verbose, union, IDF, train, categories):
                     match = True
                     break
             if match:
-                arr.append(dic_doc_tf_idf[token])
+                glossary_arr[j].append(1)
                 k += 1
             else:
                 glossary_arr[j].append(0)

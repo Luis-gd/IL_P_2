@@ -135,7 +135,7 @@ def tf_idf(doc, idf, top_k, categories, union):
                 match = True
                 break
         if match:
-            arr.append(dic_doc_tf_idf[token])
+            arr.append(1)
             k += 1
         else:
             arr.append(0)
