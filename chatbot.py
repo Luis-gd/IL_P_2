@@ -3,6 +3,7 @@ import spacy
 import es_core_news_sm
 from spacy.matcher import Matcher
 
+# Elección del CV a analizar
 rutas = ["cv_txt/cv_jorge.txt", "cv_txt/cv_luis.txt"]
 
 indice = int(input("Escribe 0 para elegir el curriculum de jorge o 1 para elegir el curriculum de luis: "))
@@ -13,6 +14,8 @@ while (indice not in range(2)):
 fichero = rutas[indice]
 
 # ,pregunta = input("Escriba su pregunta: ")
+
+# Procesamiento del txt
 
 with open(fichero, 'r') as f:
     text = [line for line in f.readlines()]
@@ -31,12 +34,20 @@ for token in doc:
 fdf = pd.DataFrame(features)
 fdf.head(len(fdf))
 
-first_tokens = ['to', 'father']
-last_tokens = ['and', 'naming']
+# Extracción del nombre del candidato
+
+last_token = ['\n']
 
 pattern_father = [[{'POS':'PROPN', 'OP' : '+'},
            {'POS':'PROPN', 'OP' : '+'},
-           {'POS':'PROPN', 'OP' : '+'}]]
+           {'POS':'PROPN', 'OP' : '+'},
+           {'LOWER': {'IN' : last_token}}]]
+
+
+new_columns = ['Nombre','Apellido1', 'Apellido2']
+for n,col in enumerate(new_columns):
+    df[col] = df['text'].apply(lambda x: encontrar_nombre(x)).apply(lambda x: x[n])
+
 
 def encontrar_nombre(x):
     nlp = es_core_news_sm.load()
@@ -56,8 +67,14 @@ def encontrar_nombre(x):
         name, surname1, surname2 = None, None, None
     return name, surname1, surname2
 
-new_columns = ['Nombre','Apellido1', 'Apellido2']
-for n,col in enumerate(new_columns):
-    df[col] = df['text'].apply(lambda x: encontrar_nombre(x)).apply(lambda x: x[n])
+def devolver_nombre(x):
+    nombre = None
+    for f in range(len(df['text'])):
+        if df['Nombre'][f] != None and df['Apellido1'][f] != None and df['Apellido2'][f] != None:
+            if f == 0:
+                nombre = df['Nombre'][f] + ' ' + df['Apellido1'][f] + ' ' + df['Apellido2'][f] 
+    return nombre
 
-print(df)
+# Prueba de la función devolver nombre:
+
+# print(devolver_nombre(df))
