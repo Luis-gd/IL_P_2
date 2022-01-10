@@ -49,11 +49,7 @@ Lenguajes de Programación: Python, R, Java, C, JavaScript, Matlab, SQL, SPARQL.
 
 Otras Tecnologías: Protegé, RDF, HTML, CSS, LATEX, RDF.
 
-Experience using Agile methodologies
-
-Experiencia de usuario avanzado en
-
-Windows 10 y GNU/Linux.ç
+Experiencia de usuario avanzado en Windows 10 y GNU/Linux.
 
 Trabajar usando metodologías ágiles(SCRUM)
 
