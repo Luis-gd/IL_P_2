@@ -34,9 +34,9 @@ fdf.head(len(fdf))
 first_tokens = ['to', 'father']
 last_tokens = ['and', 'naming']
 
-pattern_father = [[
+pattern_father = [[{'POS':'PROPN', 'OP' : '+'},
            {'POS':'PROPN', 'OP' : '+'},
-           ]]
+           {'POS':'PROPN', 'OP' : '+'}]]
 
 def encontrar_nombre(x):
     nlp = es_core_news_sm.load()
@@ -49,11 +49,14 @@ def encontrar_nombre(x):
         span = doc[matches[0][1]:matches[0][2]] 
         sub_text = span.text
     tokens = sub_text.split(' ')
-    
-    
-    name, surname = tokens[1:-1]
-    return name, surname
 
+    if len(tokens) == 3:
+        name, surname1, surname2 = tokens[0], tokens[1], tokens[2]
+    else:
+        name, surname1, surname2 = None, None, None
+    return name, surname1, surname2
+
+new_columns = ['Nombre','Apellido1', 'Apellido2']
 for n,col in enumerate(new_columns):
     df[col] = df['text'].apply(lambda x: encontrar_nombre(x)).apply(lambda x: x[n])
 
