@@ -1,77 +1,54 @@
 Jorge Angulo Rodriguez
 
 EXPERIENCIA
-
 SilverStorm, Valladolid: Deployment Consultant (media jornada)
-
 28/06/2021 - Actualidad
-
 Trabajar como consultor de I.T. en un equipo de ocho personas mejorando la
 infraestructura digital para empresas de todo el mundo. Esto consiste en trabajar con
 Servicenow y programar en JavaScript
 
 Taiger, Segovia : Prácticas
-
 15/06/2020 - 15/08/2020
-
 Trabajar en procesamiento del lenguaje natural en un equipo con cinco personas, donde
 mi responsabilidad era crear un asistente virtual para realizar análisis de sentimiento y
 reconocimiento de entidades.
 
 EDUCACIÓN
-
 Universidad Politécnica de Madrid, Máster en Inteligencia Artificial
-
 Empecé en 09-2020 y con vistas a terminar en 07/2022
-
 Machine Learning, Redes Neuronales, Ingeniería Lingüística, Redes Bayesianas, Ingeniería
 Ontológica.
 
 Universidad de Valladolid, Doble Grado degree, Grado en Matemáticas e Ingeniería Informática.
-
 De 09-2015 a 02-2021
-
 Matemáticas: Álgebra Lineal, Ecuaciones Diferenciales, Estadística, Topología, Teoría de la Probabilidad, Cálculo, Geometría Computacional. Trabajo de Fin de Grado: Geometría Algebraica y Códigos correctores de errores y Semigrupos Numéricos.
-
 Informática: Programación Orientada a Objetos, Proceso de desarrollo Software, Estructuras de datos y algoritmos, utilización de bases de datos, utilización de sistemas operativos, criptografía, Problemas de programación de horarios. Trabajo de Fin de Grado: Numerical Semigroups and Feng Rao distances with GAP.
 
+CONTACTO
 Plaza Universidad 7Izq, 6ºs 47003 Valladolid (Valladolid) 
 (+34) 620 021 363
 jorgeangulo_va@outlook.com
 
 HABILIDADES
-
 Capacidad analítica y matemática
-
 Conocimientos de probabilidad y estadística
-
 Lenguajes de Programación: Python, R, Java, C, JavaScript, Matlab, SQL, SPARQL.
-
 Otras Tecnologías: Protegé, RDF, HTML, CSS, LATEX, RDF.
-
 Experiencia de usuario avanzado en Windows 10 y GNU/Linux.
-
 Trabajar usando metodologías ágiles(SCRUM)
-
 Servicenow
 
 CONTRIBUCIONES
-
 Contribución a la librería de código abierto “NumericalSgps” https://github.com/gap-packages/numericalsgps
 
 IDIOMAS
-
 Inglés: Fluido (C2, Cambridge certificate in Advanced English)
-
 Alemán: Básico (A2)
 
 REFERENCIAS
-
 Sergio Martín Ángel: Supervisor en SilverStorm
 (smartin@silver-storm.com)
-
 Diego Ruano Benito: Director de trabajo de fin de grado
 (diego.ruano@uva.es)
-
 David Nöel: Supervisor de prácticas en Taiger
 (david.noel89@gmail.com)
