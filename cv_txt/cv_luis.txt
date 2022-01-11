@@ -5,7 +5,7 @@ INGENIERO INFORMÁTICO
 PERFIL PERSONAL
 Soy Ingeniero Informático especializado en computación y estoy cursando un máster de Inteligencia Artificial. Los lenguajes de programación con los que tengo experiencia son Python y Java aunque también me defiendo en C y estoy aprendiendo C++.
 
-AREAS DE CONOCIMIENTO
+HABILIDADES
 Desarrollo de Software
 Inteligencia Artificial
 Uso y administración de Linux
@@ -22,23 +22,23 @@ Github: Luis-gd
 LinkedIn: Luis Galocha Domínguez
 
 EXPERIENCIA LABORAL
-ESTUDIANTE INTERNO:
+Estudiante interno:
 Dept. de Computación e IA en ETSII US | nov 2020 - jul 2021
 - Estudio y aplicación de técnicas de Deep Learning technologies.
 - Trabajo con Python.
 - Estudio y aplicación de procesamiento de imágenes.
 
-HISTORIAL ACADÉMICO
-UNIVERSIDAD DE SEVILLA:
+EDUCACIÓN
+Universidad de Sevilla:
 Grado en Ingeniería Informática | sep 2017 - oct 2021
 - Matrículas de honor en asignaturas de matemáticas y porgramación.
 - Especialización en Computación e Inteligencia Artificial.
 
-UNIVERSIDAD POLITÉCNICA DE MADRID:
+Universidad Politécnica de Madrid:
 Master de investigación en IA | sep 2021 - Actualidad
 
 IDIOMAS
-TRINITY COLLEGE LONDON
+Trinity College London
 Certificado ISE III octubre 2020 (C1)
 
 REFERENCIAS DE TRABAJO

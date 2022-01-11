@@ -14,6 +14,10 @@ while (indice not in range(2)):
 
 fichero = rutas[indice]
 
+#Cambiamos la variable pregunta para elegir qué dato tomamos
+
+pregunta = 1
+
 # ,pregunta = input("Escriba su pregunta: ")
 
 # Procesamiento del txt
@@ -72,7 +76,7 @@ pattern_father = [[{'POS':'PROPN', 'OP' : '+'},
            {'POS':'PROPN', 'OP' : '+'},
            {'LOWER': {'IN' : last_token}}]]
 
-if False:
+if pregunta == 0:
     new_columns = ['Nombre','Apellido1', 'Apellido2']
     for n,col in enumerate(new_columns):
         df[col] = df['text'].apply(lambda x: encontrar_nombre(x)).apply(lambda x: x[n])
@@ -84,19 +88,50 @@ if False:
 # print(devolver_nombre(df))
 
 # Extracción de correos:
-
+'''
 data = open(fichero,'r')
 texto = data.read() 
 
-r = re.compile(r'(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?')
+r = re.compile(r'(\b[\w.]+@+[\w.]+.+[\w.]\b)')
 results = r.findall(texto)
-emails = ""
-for x in results:
-        emails += str(x)+"\n"
+email_del_candidato = results[0]
 
-print(emails)
- # Esto nos da todos los emails que contiene el texto
+ # Esto nos da todos los emails que contiene el texto, 
+
+ '''
 '''
 new_columns = ['Número']
 for n,col in enumerate(new_columns):
     df[col] = df['text'].apply(lambda x: encontrar_numero(x)).apply(lambda x: x[n]) '''
+
+# Extracción de secciones:
+
+secciones = ['EXPERIENCIA', 'EDUCACIÓN', 'CONTACTO', 'HABILIDADES', 'IDIOMAS', 'REFERENCIAS']
+
+def encontrar_seccion(seccion):
+    fila_i = None
+    fila_f = None
+    for f in range(len(df['text'])):
+        if seccion in df['text'][f]:
+            fila_i = f
+        v = [l.isupper() for l in df['text'][f].strip('\n')]
+        if fila_i != None and all(v) and f!= fila_i and len(v) != 0:
+            fila_f = f
+            break
+    return (fila_i, fila_f) 
+    
+'''
+if pregunta == 1:
+    new_columns = ['Experiencia']
+    for n,col in enumerate(new_columns):
+        df[col] = df['text'].apply(lambda x: encontrar_seccion_experiencia(x)).apply(lambda x: x[n])
+'''
+print(encontrar_seccion(secciones[0]))
+def saca_texto(lineas):
+    i, f = lineas
+    texto = ''
+    for j in range(i, f):
+        texto += df['text'][j]
+    return texto
+
+print(saca_texto(encontrar_seccion(secciones[0])))
