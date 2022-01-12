@@ -187,7 +187,7 @@ def main():
             print("El email del candidato es:", email_del_candidato)
 
         # Llamada para sacar el número de teléfono del candidato
-
+        # Te dejo la estructura del email porque podría sacarse de forma similar
         if pregunta == 2:
             data = open(fichero,'r')
             texto = data.read() 
